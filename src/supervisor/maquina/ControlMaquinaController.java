@@ -22,7 +22,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import supervisor.maquina.Rutina_COM.TabletCOM;
 
 /**
  *
@@ -35,7 +34,6 @@ public class ControlMaquinaController implements Initializable {
 		// TODO corregir las distancias de la javalina
 	
 	Double x0=214.1;
-	Rutina_COM rutCom;
 	Double y0=86.3;
 	Double z0=211.0;
 	Double la=192.0;
@@ -279,9 +277,9 @@ public class ControlMaquinaController implements Initializable {
 
 	@FXML
 	private void handleButtonMezclar(ActionEvent e) {
-		grua.mixingRoutine(0, 1,"C://Compost//Rutina//demo-A.txt");//TODO verificar tema rutinas
+		grua.mixingRoutine(31, 2, "C://Users//Francisco//Desktop//demo-B.txt");//TODO verificar tema rutinas
 		
-		rutina = true;
+		//rutina = true;
 		paso_rut = 0;
 	}
 
@@ -346,36 +344,11 @@ public class ControlMaquinaController implements Initializable {
 	public void initialize(URL url, ResourceBundle rb) {
 
 		grua.actualizador.play();
-		
-		rutCom = new Rutina_COM();
-		rutCom.setTabletCOM(new TabletCOM() {
-			
-			@Override
-			public void DataProcesedB(int reactor, int sector, String pathB) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void DataProcesedA(int reactor, int sector, String pathA) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void DataProcesed(int reactor, int sector, String pathA,
-					int reactorB, int sectoB, String pathB) {
-				// TODO Auto-generated method stub
-				grua.mixingRoutine(0, 1, pathA);//TODO verificar tema rutinas
-				pathSp=pathB;
-				rutina_tablet = true;
-				paso_rut_tablet = 0;
-			}
-		});
+
 		PX.textProperty().bind(grua.show_posPortico);
 		PY.textProperty().bind(grua.show_posCarro);
 		PZ.textProperty().bind(grua.show_posElevador);
-		PR.textProperty().bind(grua.show_posRotador);;
+		PR.textProperty().bind(grua.show_posRotador);
 
 		PosRX.textProperty().bind(grua.show_xRel);
 		PosRY.textProperty().bind(grua.show_yRel);
@@ -419,7 +392,7 @@ public class ControlMaquinaController implements Initializable {
 				// TODO Auto-generated method stub
 				if(rutina){
 					if(paso_rut==0){
-						grua.mixingRoutine(0, 2,"C://Compost//Rutina//demo-B.txt");
+						grua.mixingRoutine(31, 2, "C://Users//Francisco//Desktop//demo-B.txt");
 					}
 					else{
 						rutina=false;

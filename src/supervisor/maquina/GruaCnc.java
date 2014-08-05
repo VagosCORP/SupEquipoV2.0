@@ -46,6 +46,14 @@ public class GruaCnc {
 		public void OnGtiSucces();
 		public void OnGtiFails();
 		
+		public void OnGtRtctStarts();
+		public void OnGtRtctSucces();
+		public void OnGtRtctFails();
+		
+		public void OnPrpfrtctStarts();
+		public void OnPrpfrtctSucces();
+		public void OnPrpfrtctFails();
+		
 		public void OnInsertToolStarts();
 		public void OnInsertToolSucces();
 		public void OnInsertToolFails();

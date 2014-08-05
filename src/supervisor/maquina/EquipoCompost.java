@@ -158,6 +158,44 @@ public class EquipoCompost extends GruaCnc {
 				routine=false;
 				mixingRoutineListener.OnMixingFails();
 			}
+
+			@Override
+			public void OnGtRtctStarts() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void OnGtRtctSucces() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void OnGtRtctFails() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void OnPrpfrtctStarts() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void OnPrpfrtctSucces() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void OnPrpfrtctFails() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			
 		});
 	}
 	

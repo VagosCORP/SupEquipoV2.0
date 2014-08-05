@@ -206,7 +206,6 @@ pip-log.txt
 # Unit test / coverage reports
 .coverage
 .tox
-.classpath
 
 #Translations
 *.mo

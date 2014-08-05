@@ -203,7 +203,6 @@ public class GruaCnc {
 					System.out.println("Estado :"+resin);
 					
 					if(tool){
-			
 						if(resin==0){
 							routineListener.OnToolSpin();
 							System.out.println("Herramienta Girando");
@@ -229,7 +228,7 @@ public class GruaCnc {
 	public Double posZ; // centimetros
 	public Double posR; // grados de inclinacion del agitador
 	public Double nR_act; // numero de reactor actual
-	public Double nR_des; // numero de reactor actual
+	public Double nR_des; // numero de reactor deseado
 	public Double sec; // sector del vagon actual
 	// Posición de la punta del agitador como propiedades para muestra en
 	// interfaz de usuario
@@ -1223,6 +1222,7 @@ public class GruaCnc {
 			} catch (Bounds e) {
 				// TODO Auto-generated catch block
 				// e.printStackTrace();
+				//TODO agregar supervicion al introducir herramienta
 				if(mov==MIX){//TODO verificar si no asesina a cada rato las rutinas de mezclado
 					detener();
 					toolOff();
@@ -1249,8 +1249,13 @@ public class GruaCnc {
 
 			// actualizar estado del equipo, si libre u ocupado
 
+			//TODO verificar que ningun movimiento se este saliendo de rango
+			
 			int reswk;
 			reswk = control.is_working();
+			
+			
+			
 			if (reswk != 2) {
 				if (reswk == 1) {
 					ocupado.set(true);
@@ -1281,7 +1286,7 @@ public class GruaCnc {
 						break;
 					}
 					case(INSRT_TOOL):{
-						if(posR>=59){
+						if(posR>=59&&posR<=61){//TODO verificar rangos y asegurar las condiciones para declarar exitoso usar variable de error
 							routineListener.OnInsertToolSucces();
 						}
 						else{
@@ -1290,7 +1295,7 @@ public class GruaCnc {
 						break;
 					}
 					case(RTRT_TOOL):{
-						if(posR<=1){
+						if(posR<=1){//TODO no error y que z tb haya completado movimiento
 							routineListener.OnRetractToolSuccess();
 						}
 						else{

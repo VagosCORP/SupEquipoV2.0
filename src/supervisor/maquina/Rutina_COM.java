@@ -18,6 +18,7 @@ public class Rutina_COM {
 	String tarea = "";
 	Path pathRegistro;
 	PrintWriter oStReg=null;
+	//Sync Test
 	
 	public TabletCOM tabletCOM;
 	public interface TabletCOM {

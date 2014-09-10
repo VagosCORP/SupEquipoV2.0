@@ -277,9 +277,8 @@ public class ControlMaquinaController implements Initializable {
 
 	@FXML
 	private void handleButtonMezclar(ActionEvent e) {
-		grua.mixingRoutine(31, 2, "C://Users//Francisco//Desktop//demo-B.txt");//TODO verificar tema rutinas
-		
-		//rutina = true;
+		grua.mixingRoutine(31, 1, "C://Users//Francisco//Desktop//demo-A.txt");//TODO verificar tema rutinas
+		rutina = true;
 		paso_rut = 0;
 	}
 

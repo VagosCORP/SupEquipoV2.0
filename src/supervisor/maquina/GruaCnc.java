@@ -123,6 +123,7 @@ public class GruaCnc {
 	public static final int MOV_XY_TOOL = 8;
 	public static final int MOV_XY_JAV = 9;
 	public static final int GOTO_INSRT = 10;
+	public static final int PRP_FOR_RTRT=11;
 
 	// Clase de control del equipo
 	// de momento la dll se inicializara en la clase principal luego se vera si
@@ -196,12 +197,12 @@ public class GruaCnc {
 	Timeline toolChk = new Timeline(new KeyFrame(Duration.millis(500),
 			new EventHandler<ActionEvent>() {
 				@Override
-				public void handle(ActionEvent event) {
+				public void handle(ActionEvent event) {//TODO agregar capacidad de reintentar vinculo con el dispositivo
 					conectar();
 					System.out.println("Verificando estado de la herramienta");
 					int resin=control.input_read((short)12);
 					System.out.println("Estado :"+resin);
-					
+					desconectar();
 					if(tool){
 						if(resin==0){
 							routineListener.OnToolSpin();
@@ -217,7 +218,7 @@ public class GruaCnc {
 							routineListener.OnToolStopFails();
 						}
 					}
-					desconectar();
+					
 				}
 			}));
 	// Gestion de posicionamiento
@@ -555,8 +556,8 @@ public class GruaCnc {
 		if ((r == rActual && s == sActual) || posR < 1) {
 			try {
 				gestpos.getReactor(p_abs[0], p_abs[1]);
-				movXY_tool(p_abs[0], p_abs[1]);
 				mov = GOTO_R_TOOL;
+				movXY_tool(p_abs[0], p_abs[1]);
 			} catch (Bounds e) {
 				movListener.OnOutOfBounds();
 				e.printStackTrace();
@@ -750,7 +751,64 @@ public class GruaCnc {
 		mov=GOTO_INSRT;
 		
 	}
-	
+	public void prpForRtrct(Double y){
+		try {
+			Integer[] reacActual;
+			Double[] pref;
+			
+			reacActual=gestpos.getReactor(posX, posY);
+			
+			Double max[]=gestpos.getMaxCordRel();
+			pref=gestpos.getRefPoint(reacActual[0],reacActual[1]);
+			
+			Double xabs=0.1+pref[0];
+			Double yabs=y+pref[1];
+
+			Double ymaq = yabs - y0;
+			Double rmaq = 60.0;
+			Double zmaq=zMin;
+
+			Double xmaq = xabs - x0 - de * Math.sin(Math.toRadians(90.0))
+					- la * Math.cos(Math.toRadians(90.0));
+			
+			if(y>=0&&y<=max[1]&&xmaq>=xMin&&xmaq<=xMax&&ymaq>=yMin&&ymaq<=yMax){
+				int pulsos1 = (int) (xmaq * Rx * Rp);
+				int pulsos2 = pulsos1;
+				int pulsos3 = (int) (ymaq * Ry * Rp);
+				int pulsos5 = (int) (rmaq * Rr * Rp);
+				int pulsos4 = (int) (zmaq * Rz * Rz);
+				conectar();
+				int res = control.fifo(pulsos1,
+						pulsos2,
+						pulsos3,
+						//pulsos4,//TODO agregar Z!!! 
+						pulsos5, (int) (1200 * Rp/60.0));
+				desconectar();
+				if(res== NO_ERR){
+					ocupado.set(true);
+					routineListener.OnPrpfrtctStarts();
+					mov=PRP_FOR_RTRT;
+					actualizador.play();
+				}
+					
+			
+			}else{
+				movListener.OnOutOfBounds();
+				routineListener.OnPrpfrtctFails();
+				System.out.println("Movimiento fuera de rango");
+				
+			}
+
+
+		} catch (Bounds e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Fuera de Rango");
+			movListener.OnOutOfBounds();
+			routineListener.OnPrpfrtctFails();
+		}
+		
+	}
 
 
 	/**
@@ -823,6 +881,9 @@ public class GruaCnc {
 	public void rtrtTool() {
 		if (!ocupado.get()) {
 			try {
+				
+
+				
 				gestpos.getReactor(posX, posY);
 				Double ymaq = posCarro;
 				Double rmaq2 = 0.0;
@@ -854,7 +915,41 @@ public class GruaCnc {
 					routineListener.OnRetractToolFails();
 					movListener.OnOutOfBounds();
 				}
-				
+			
+//PROCEDIMIENTO DE RETIRAR DIRECTAMENTE
+//			try {
+//				gestpos.getReactor(posX, posY);
+//				Double ymaq = posCarro;
+//				Double rmaq2 = 0.0;
+//				Double xmaq = posX - x0 - de * Math.sin(Math.toRadians(90.0))
+//						- la * Math.cos(Math.toRadians(90.0));
+//			
+//				int pulsos1 = (int) (xmaq * Rx * Rp);
+//				int pulsos2 = pulsos1;
+//				int pulsos3 = (int) (ymaq * Ry * Rp);
+//				int pulsos5_2 = (int) (rmaq2 * Rr * Rp);
+//				if ((xmaq <= xMax) && (xmaq >= xMin) && (ymaq >= yMin)
+//						&& (ymaq <= yMax) ) {
+//					conectar();
+//					int res1 = control.fifo(pulsos1,
+//							pulsos2,
+//							pulsos3,
+//							pulsos5_2, (int) (1200 * Rp/60.0));
+//					desconectar();
+//					if (res1 == NO_ERR) {
+//						ocupado.set(true);
+//						routineListener.OnRetractToolStarts();
+//						actualizador.play();
+//						mov = RTRT_TOOL;
+//					}
+//
+//				} else {
+//					System.out
+//							.println("Movimiento fuera del rango permitido del equipo");
+//					routineListener.OnRetractToolFails();
+//					movListener.OnOutOfBounds();
+//				}
+//PROCEDIMIENTO COMBINADO				
 //				gestpos.getReactor(posX, posY);
 //				Double ymaq = posCarro;
 //				Double zmaq = zMax;
@@ -943,7 +1038,7 @@ public class GruaCnc {
 	 *            posición en Y deseada
 	 */
 	public void movXY_tool(Double x, Double y) {
-		if (!ocupado.get()) {
+		if (!ocupado.get()) {//TODO asegurar que la herramienta este en posicion de reposo
 			int pulsos1;
 			int pulsos2;
 			int pulsos3;
@@ -986,7 +1081,7 @@ public class GruaCnc {
 	}
 
 	public void movXY_tool(Double x, Double y, Double a) {
-		if (!ocupado.get()) {
+		if (!ocupado.get()) {//TODO asegurar que la herramienta este en posicion de reposo
 			int pulsos1;
 			int pulsos2;
 			int pulsos3;
@@ -1186,7 +1281,7 @@ public class GruaCnc {
 				control.stop(); //TODO Verificar que no traiga problemas
 				System.out.println();
 				System.out.println("Desfase entre motores eje X :"
-						+ Math.abs(pulsos1 - pulsos2));
+						+ Math.abs(pulsos1 - pulsos2));//TODO cambiar estado a alguna variable que evite reportar como exitoso algun movimiento
 			}
 
 			pX = -pulsos1;
